@@ -60,8 +60,7 @@ namespace ProvaPub.Tests
             var purchaseValue = 100;
             var dbContext = new Mock<TestDbContext>();
             dbContext.Setup(d => d.Customers.FindAsync(customerId)).ReturnsAsync(new Customer());
-            dbContext.Setup(d => d.Orders.CountAsync(s => s.CustomerId == customerId && s.OrderDate >= It.IsAny<DateTime>()))
-                .ReturnsAsync(1); // Customer already purchased this month
+            dbContext.Setup(d => d.Orders.Any(s => s.CustomerId == customerId && s.OrderDate >= It.IsAny<DateTime>())); // Customer already purchased this month
             var customerService = new CustomerService(dbContext.Object);
 
             // Act
@@ -79,10 +78,9 @@ namespace ProvaPub.Tests
             var purchaseValue = 200;
             var dbContext = new Mock<TestDbContext>();
             dbContext.Setup(d => d.Customers.FindAsync(customerId)).ReturnsAsync(new Customer());
-            dbContext.Setup(d => d.Orders.CountAsync(s => s.CustomerId == customerId && s.OrderDate >= It.IsAny<DateTime>()))
-                .ReturnsAsync(0); // First-time customer
-            dbContext.Setup(d => d.Customers.CountAsync(s => s.Id == customerId && s.Orders.Any()))
-                .ReturnsAsync(0); // Customer never bought before
+            dbContext.Setup(d => d.Orders.Any(s => s.CustomerId == customerId && s.OrderDate >= It.IsAny<DateTime>()));           
+            dbContext.Setup(d => d.Customers.Any(s => s.Id == customerId && s.Orders.Any()));
+                
             var customerService = new CustomerService(dbContext.Object);
 
             // Act
@@ -100,10 +98,8 @@ namespace ProvaPub.Tests
             var purchaseValue = 50;
             var dbContext = new Mock<TestDbContext>();
             dbContext.Setup(d => d.Customers.FindAsync(customerId)).ReturnsAsync(new Customer());
-            dbContext.Setup(d => d.Orders.CountAsync(s => s.CustomerId == customerId && s.OrderDate >= It.IsAny<DateTime>()))
-                .ReturnsAsync(0); // No previous purchases this month
-            dbContext.Setup(d => d.Customers.CountAsync(s => s.Id == customerId && s.Orders.Any()))
-                .ReturnsAsync(1); // Customer bought before
+            dbContext.Setup(d => d.Orders.Any(s => s.CustomerId == customerId && s.OrderDate >= It.IsAny<DateTime>())); 
+            dbContext.Setup(d => d.Customers.Any(s => s.Id == customerId && s.Orders.Any()));
             var customerService = new CustomerService(dbContext.Object);
 
             // Act
